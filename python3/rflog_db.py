@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #rflog_db.py Interface between RF Module serial interface and AdafruitIO
 #---------------------------------------------------------------------------------
-# J. Evans May 2018
+# Release from JemRF.com
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -13,6 +13,7 @@
 # V1.00 - Release
 # V2.00 - Updates to improve performance and added new sensor types
 # V3.00 - Updated for Python 3
+# V3.10 - Updated to fix issue with BME devices and add support for RSSI.
 # -----------------------------------------------------------------------------------
 #
 import MySQLdb
