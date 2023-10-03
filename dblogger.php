@@ -30,9 +30,9 @@ function DisplayTelemetryLog($num_rows_to_display){
 	echo "<tr>";
 	echo "<th>Date</th>";
 	echo "<th>Device ID</th>";
-	echo "<th>Type</th>";
-	echo "<th>Value</th>";
-	echo "<th>UOM</th>";
+	echo "<th>&nbsp; Type &nbsp;</th>";
+	echo "<th>&nbsp; Value &nbsp;</th>";
+	echo "<th>&nbsp; UOM &nbsp;</th>";
 	echo "</tr>";
 	
 	for ($row_no = 0; 
@@ -42,10 +42,10 @@ function DisplayTelemetryLog($num_rows_to_display){
 	    $res->data_seek($row_no);
 	    $row = $res->fetch_assoc();
 		echo "<td>".$row['date']."</td>";
-	    echo "<td>".$row['device_id']."</td>";
-	    echo "<td>".$row['type']."</td>";
-		echo "<td>".$row['value']."</td>";
-	    echo "<td>".$row['unit_of_measure']."</td>";
+	    echo "<td align='center'>".$row['device_id']."</td>";
+	    echo "<td align='center'>".$row['type']."</td>";
+		echo "<td align='center'>".$row['value']."</td>";
+	    echo "<td align='center'>".$row['unit_of_measure']."</td>";
 		echo "</tr>";
 	}
 	echo "</table>";

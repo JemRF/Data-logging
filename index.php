@@ -1,5 +1,6 @@
 <?php
+    $showlast = 20;
     include ("dblogger.php");
-    echo "The last 10 telemetry logs are:";
-    echo DisplayTelemetryLog(10);
+    echo "The last ",$showlast," telemetry logs are:";
+    echo DisplayTelemetryLog($showlast);
 ?>

@@ -79,7 +79,7 @@ def ProcessMessage(value, DevId, type, uom):
 
 def remove_duplicates():
     x=0
-    print("sorted deduplified queue:")
+    dprint("sorted deduplified queue:")
 
     #sort the queue by ID
     rfsettings.message_queue = sorted(rfsettings.message_queue, key = lambda x: (x[0]))
@@ -99,36 +99,41 @@ def queue_processing():
   global measure
   try:
     sensordata=""
-    bme_data=""
+    bme_data=bytearray()
     bme_messages=0
     uom=""
     start_time = time.time()
     while (True):
         if len(rfsettings.message_queue)>0 and not rfsettings.rf_event.is_set():
-            remove_duplicates()
+            if bme_messages == 0:
+               remove_duplicates()
             message = rfsettings.message_queue.pop()
-            devID = message[0]
-            data = message[1]
-            dprint(time.strftime("%c")+ " " + message[0]+message[1])
+            try:
+               devID = message[0].decode()
+               data = message[1].decode()
+               dprint(time.strftime("%c")+ " " + devID + data)
+            except Exception as e:
+               data = "BMP"
+
             if data.startswith('BUTTONON'):
                 sensordata=0
                 db_type=1
-                uom=""
+                uom="B"
 
             if data.startswith('STATEON'):
                 sensordata=0
                 db_type=2
-                uom=""
+                uom="S"
 
             if data.startswith('STATEOFF'):
                 sensordata=1
                 db_type=2
-                uom=""
+                uom="S"
 
             if data.startswith('BUTTONOFF'):
                 sensordata=1
                 db_type=1
-                uom=""
+                uom="S"
 
             if data.startswith('TMPA'):
                 sensordata=DoFahrenheitConversion(str(data[4:].rstrip("-")))
@@ -174,17 +179,24 @@ def queue_processing():
                 sensordata=data[4:].strip('-')
                 db_type=6
                 uom="V"
-
+                
+            if data.startswith('RSSI'):
+                sensordata=data[4:]
+                db_type=8
+                uom="d"
+         
             if data.startswith('BMP') or (bme_messages>0 and sensordata==''):
+              data = message[1]
               start_time = time.time()
               if bme_messages==0:
-                  bme_data=bme_data+data[5:9]
+                  bme_data[len(bme_data):]=data[5:9]
               else:
-                  bme_data=bme_data+data[0:9]
+                  bme_data[len(bme_data):]=data[0:9]
               bme_messages=bme_messages+1
 
 
               if bme_messages==5:
+                bme_messages=0
                 bme280=process_bme_reading(bme_data, devID)
                 if bme280.error != "":
                   dprint(bme280.error)
@@ -199,8 +211,8 @@ def queue_processing():
                   if bme280.hum_rt == 1:
                     measure='2'
                     ProcessMessage(round(bme280.press/100,1), devID, 7, "P")
-                bme_messages=0;
-                bme_data=""
+                bme_messages=0
+                bme_data=bytearray()
             if sensordata != "":
                 ProcessMessage(sensordata, devID, db_type, uom)
         sensordata=""
@@ -211,8 +223,8 @@ def queue_processing():
         elapsed_time = time.time() - start_time
         if (elapsed_time > 5):
             start_time = time.time()-120
-            bme_messages=0;
-            bme_data=""
+            bme_messages=0
+            bme_data=bytearray()
 
   except Exception as e:
       template = "An exception of type {0} occurred. Arguments:\n{1!r}"
@@ -230,6 +242,7 @@ def DoFahrenheitConversion(value):
   return(value)
 
 def main():
+    dprint("Data Logger Started.")
     rfsettings.init()
 
     a=Thread(target=rf2serial, args=())
